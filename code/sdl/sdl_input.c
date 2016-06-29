@@ -849,6 +849,7 @@ static void IN_ProcessEvents( void )
 				{
 					case SDL_WINDOWEVENT_RESIZED:
 						{
+#ifndef HAVE_GLES
 							int width, height;
 
 							width = e.window.data1;
@@ -868,6 +869,7 @@ static void IN_ProcessEvents( void )
 							// we aren't constantly recreating the GL context while
 							// he tries to drag...
 							vidRestartTime = Sys_Milliseconds( ) + 1000;
+#endif
 						}
 						break;
 

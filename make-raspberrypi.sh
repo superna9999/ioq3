@@ -5,7 +5,6 @@ git_hash=$(git describe --always)
 make \
 	BR=build \
 	BD=build \
-	V=1 \
 	USE_CODEC_VORBIS=1 \
 	USE_CURL=1 \
 	USE_CURL_DLOPEN=0 \

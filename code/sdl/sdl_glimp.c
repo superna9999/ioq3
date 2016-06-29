@@ -484,8 +484,16 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 				continue;
 			}
 		}
+
+		SDL_SetWindowIcon( SDL_window, icon );
 #else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, testDepthBits);
+
+		glConfig.vidWidth = ri.Cvar_Get("r_gleswidth", "853", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+		glConfig.vidHeight = ri.Cvar_Get("r_glesheight", "480", CVAR_ARCHIVE | CVAR_LATCH )->integer;;
+		glConfig.windowAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+		r_swapInterval->integer = 1;
 
 		if( ( SDL_window = SDL_CreateWindow( CLIENT_WINDOW_TITLE, x, y,
 			glConfig.vidWidth, glConfig.vidHeight, flags ) ) == 0 )
@@ -494,8 +502,6 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 			continue;
 		}
 #endif //HAVE_GLES
-
-		SDL_SetWindowIcon( SDL_window, icon );
 
 		if( ( SDL_glContext = SDL_GL_CreateContext( SDL_window ) ) == NULL )
 		{
