@@ -274,8 +274,8 @@ ifneq ($(BUILD_CLIENT),0)
     CURL_LIBS ?= $(shell pkg-config --silence-errors --libs libcurl)
     OPENAL_CFLAGS ?= $(shell pkg-config --silence-errors --cflags openal)
     OPENAL_LIBS ?= $(shell pkg-config --silence-errors --libs openal)
-    SDL_CFLAGS ?= $(shell pkg-config --silence-errors --cflags sdl2|sed 's/-Dmain=SDL_main//')
-    SDL_LIBS ?= $(shell pkg-config --silence-errors --libs sdl2)
+    SDL_CFLAGS ?= $(shell sdl2-config --cflags)
+    SDL_LIBS ?= $(shell sdl2-config --libs)
     FREETYPE_CFLAGS ?= $(shell pkg-config --silence-errors --cflags freetype2)
   else
     # assume they're in the system default paths (no -I or -L needed)
@@ -285,8 +285,8 @@ ifneq ($(BUILD_CLIENT),0)
   # Use sdl2-config if all else fails
   ifeq ($(SDL_CFLAGS),)
     ifneq ($(call bin_path, sdl2-config),)
-      SDL_CFLAGS ?= $(shell sdl2-config --cflags)
-      SDL_LIBS ?= $(shell sdl2-config --libs)
+      SDL_CFLAGS ?= $(shell pkg-config --silence-errors --cflags sdl2|sed 's/-Dmain=SDL_main//')
+      SDL_LIBS ?= $(shell pkg-config --silence-errors --libs sdl2)
     endif
   endif
 endif

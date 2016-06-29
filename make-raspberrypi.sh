@@ -28,5 +28,5 @@ make \
 	COMPILE_PLATFORM=linux \
 	VERSION=1.36+${git_hash} \
 	COPYDIR=/opt/quake3/ \
-	release
-
+	release \
+	-j4
