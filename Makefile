@@ -366,6 +366,8 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu" "gnu")
   LDFLAGS += -L/opt/vc/lib
   CLIENT_LIBS=$(SDL_LIBS) -lbcm_host
   RENDERER_LIBS = $(SDL_LIBS) -lbcm_host -lEGL -lGLESv1_CM
+  SDLDIR=$(MOUNT_DIR)/raspberry
+  RPI_VIDEO=1
   else
   CLIENT_LIBS=$(SDL_LIBS)
   RENDERER_LIBS = $(SDL_LIBS) -lGL
@@ -1624,12 +1626,16 @@ Q3OBJ = \
   $(B)/client/l_precomp.o \
   $(B)/client/l_script.o \
   $(B)/client/l_struct.o \
-  \
-  $(B)/client/sdl_input.o \
-  $(B)/client/sdl_snd.o \
-  \
   $(B)/client/con_log.o \
   $(B)/client/sys_main.o
+
+ifdef RPI_VIDEO
+  Q3OBJ +=	$(B)/client/rpi_input.o \
+  		$(B)/client/rpi_snd.o
+else
+  Q3OBJ +=	$(B)/client/sdl_input.o \
+  		$(B)/client/sdl_snd.o
+endif
 
 ifdef MINGW
   Q3OBJ += \
@@ -1676,10 +1682,15 @@ Q3R2OBJ = \
   $(B)/renderergl2/tr_sky.o \
   $(B)/renderergl2/tr_surface.o \
   $(B)/renderergl2/tr_vbo.o \
-  $(B)/renderergl2/tr_world.o \
-  \
-  $(B)/renderergl1/sdl_gamma.o \
-  $(B)/renderergl1/sdl_glimp.o
+  $(B)/renderergl2/tr_world.o
+
+ifdef RPI_VIDEO
+  Q3R2OBJ +=	$(B)/renderergl1/rpi_gamma.o \
+  		$(B)/renderergl1/rpi_glimp.o
+else
+  Q3R2OBJ +=	$(B)/renderergl1/sdl_gamma.o \
+  		$(B)/renderergl1/sdl_glimp.o
+endif
 
 Q3R2STRINGOBJ = \
   $(B)/renderergl2/glsl/bokeh_fp.o \
@@ -1740,10 +1751,15 @@ Q3ROBJ = \
   $(B)/renderergl1/tr_shadows.o \
   $(B)/renderergl1/tr_sky.o \
   $(B)/renderergl1/tr_surface.o \
-  $(B)/renderergl1/tr_world.o \
-  \
-  $(B)/renderergl1/sdl_gamma.o \
-  $(B)/renderergl1/sdl_glimp.o
+  $(B)/renderergl1/tr_world.o
+
+ifdef RPI_VIDEO
+  Q3ROBJ +=	$(B)/renderergl1/rpi_gamma.o \
+  		$(B)/renderergl1/rpi_glimp.o
+else
+  Q3ROBJ +=	$(B)/renderergl1/sdl_gamma.o \
+  		$(B)/renderergl1/sdl_glimp.o
+endif
 
 ifneq ($(USE_RENDERER_DLOPEN), 0)
   Q3ROBJ += \
