@@ -128,14 +128,18 @@ static qboolean GLimp_StartDriver()
 	EGLint num_config;
 	EGLBoolean result;
 
-	static const EGLint attribute_list[] =
+	glConfig.colorBits = 24;
+	glConfig.depthBits = ri.Cvar_Get("r_glesdepthbits", "24", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+	glConfig.stencilBits = ri.Cvar_Get("r_glesstencilbits", "0", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+
+	EGLint attribute_list[] =
 	{
 		EGL_RED_SIZE, 8,
 		EGL_GREEN_SIZE, 8,
 		EGL_BLUE_SIZE, 8,
 		EGL_ALPHA_SIZE, 0,
-		EGL_DEPTH_SIZE, 24,
-		EGL_STENCIL_SIZE, 0,
+		EGL_DEPTH_SIZE, glConfig.depthBits,
+		EGL_STENCIL_SIZE, glConfig.stencilBits,
 		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 		EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 		EGL_NONE
@@ -167,8 +171,8 @@ static qboolean GLimp_StartDriver()
 	if(s_egl_context == EGL_NO_CONTEXT)
 		ri.Error(ERR_FATAL, "GLimp_StartDriver() - could not create EGL context");
 
-	int windowWidth = ri.Cvar_Get("r_gleswidth", "853", CVAR_ARCHIVE | CVAR_LATCH )->integer;
-	int windowHeight = ri.Cvar_Get("r_glesheight", "480", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+	int windowWidth = ri.Cvar_Get("r_gleswidth", "1280", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+	int windowHeight = ri.Cvar_Get("r_glesheight", "720", CVAR_ARCHIVE | CVAR_LATCH )->integer;
 	int screenWidth;
 	int screenHeight;
 
@@ -214,9 +218,6 @@ static qboolean GLimp_StartDriver()
 	eglSwapBuffers(s_egl_display, s_egl_surface);
 	eglSwapInterval(s_egl_display, 1);
 
-	glConfig.colorBits = 24;
-	glConfig.depthBits = 24;
-	glConfig.stencilBits = 0;
 	glConfig.vidWidth = windowWidth;
 	glConfig.vidHeight = windowHeight;
 	glConfig.windowAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
