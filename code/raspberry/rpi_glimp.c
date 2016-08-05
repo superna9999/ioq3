@@ -129,8 +129,8 @@ static qboolean GLimp_StartDriver()
 	EGLBoolean result;
 
 	glConfig.colorBits = 24;
-	glConfig.depthBits = ri.Cvar_Get("r_glesdepthbits", "24", CVAR_ARCHIVE | CVAR_LATCH )->integer;
-	glConfig.stencilBits = ri.Cvar_Get("r_glesstencilbits", "0", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+	glConfig.depthBits = 24;
+	glConfig.stencilBits = 0;
 
 	EGLint attribute_list[] =
 	{
@@ -171,20 +171,58 @@ static qboolean GLimp_StartDriver()
 	if(s_egl_context == EGL_NO_CONTEXT)
 		ri.Error(ERR_FATAL, "GLimp_StartDriver() - could not create EGL context");
 
-	int windowWidth = ri.Cvar_Get("r_gleswidth", "1280", CVAR_ARCHIVE | CVAR_LATCH )->integer;
-	int windowHeight = ri.Cvar_Get("r_glesheight", "720", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+	int windowWidth = ri.Cvar_Get("r_rpi_width", "0", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+	int windowHeight = ri.Cvar_Get("r_rpi_height", "0", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+	float res_scale = ri.Cvar_Get("r_rpi_scale", "1.0", CVAR_ARCHIVE | CVAR_LATCH )->value;
+	unsigned int upscale = (unsigned int)ri.Cvar_Get("r_rpi_upscale", "1", CVAR_ARCHIVE | CVAR_LATCH )->integer;
 	int screenWidth;
 	int screenHeight;
 
 	graphics_get_display_size(0 /* LCD */, &screenWidth, &screenHeight);
+
+	// If width or height is 0, just set them to the screen size
+	if(windowWidth == 0)
+		windowWidth = screenWidth;
+	if(windowHeight == 0)
+		windowHeight = screenHeight;
+
+	// Scale resolution
+	windowWidth *= res_scale;
+	windowHeight *= res_scale;
+
 	float scale = (float)screenWidth / windowWidth;
 	if(windowHeight * scale > screenHeight)
 		scale = (float)screenHeight / windowHeight;
 
-	dst_rect.width = windowWidth * scale;
-	dst_rect.height = windowHeight * scale;
-	dst_rect.x = (screenWidth - dst_rect.width) / 2;
-	dst_rect.y = (screenHeight - dst_rect.height) / 2;
+	unsigned int stretch = (unsigned int)ri.Cvar_Get("r_rpi_mode", "0", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+
+	if(stretch == 0)
+	{
+		dst_rect.width = windowWidth * scale;
+		dst_rect.height = windowHeight * scale;
+		dst_rect.x = (screenWidth - dst_rect.width) / 2;
+		dst_rect.y = (screenHeight - dst_rect.height) / 2;
+	}
+	else if(stretch == 1)
+	{
+		dst_rect.width = screenWidth;
+		dst_rect.height = screenHeight;
+		dst_rect.x = 0;
+		dst_rect.y = 0;
+	}
+	else
+	{
+		dst_rect.width = windowWidth;
+		dst_rect.height = windowHeight;
+		dst_rect.x = (screenWidth - dst_rect.width) / 2;
+		dst_rect.y = (screenHeight - dst_rect.height) / 2;
+	}
+
+	float orig_aspect = (float)windowWidth / (float)windowHeight;
+
+	// Convert to 4:3
+	if(upscale > 0)
+		windowWidth = windowHeight * 1.333333333f;
 
 	src_rect.x = 0;
 	src_rect.y = 0;
@@ -220,7 +258,7 @@ static qboolean GLimp_StartDriver()
 
 	glConfig.vidWidth = windowWidth;
 	glConfig.vidHeight = windowHeight;
-	glConfig.windowAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+	glConfig.windowAspect = orig_aspect;
 	r_swapInterval->integer = 1;
 
 	ri.Printf(PRINT_ALL, "Initialized RPI Display\n");

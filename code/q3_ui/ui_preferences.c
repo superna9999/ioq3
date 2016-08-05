@@ -142,7 +142,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 		break;
 
 	case ID_SYNCEVERYFRAME:
-		trap_Cvar_SetValue( "r_finish", s_preferences.synceveryframe.curvalue );
+		trap_Cvar_SetValue( "r_finish", 0 );
 		break;
 
 	case ID_FORCEMODEL:
