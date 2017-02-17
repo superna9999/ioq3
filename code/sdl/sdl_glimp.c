@@ -343,7 +343,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		glConfig.isFullscreen = qfalse;
 	}
 
-	colorBits = r_colorbits->value;
+	colorBits = 24; //r_colorbits->value;
 	if ((!colorBits) || (colorBits >= 32))
 		colorBits = 24;
 
@@ -488,10 +488,13 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		SDL_SetWindowIcon( SDL_window, icon );
 #else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+		SDL_GL_SetAttribute( SDL_GL_RED_SIZE, perChannelColorBits );
+		SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, perChannelColorBits );
+		SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, perChannelColorBits );
 		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, testDepthBits);
 
-		glConfig.vidWidth = ri.Cvar_Get("r_gleswidth", "853", CVAR_ARCHIVE | CVAR_LATCH )->integer;
-		glConfig.vidHeight = ri.Cvar_Get("r_glesheight", "480", CVAR_ARCHIVE | CVAR_LATCH )->integer;;
+		glConfig.vidWidth = 1920; //ri.Cvar_Get("r_gleswidth", "1920", CVAR_ARCHIVE | CVAR_LATCH )->integer;
+		glConfig.vidHeight = 1080; //ri.Cvar_Get("r_glesheight", "1080", CVAR_ARCHIVE | CVAR_LATCH )->integer;;
 		glConfig.windowAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
 		r_swapInterval->integer = 1;
 

@@ -366,13 +366,11 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu" "gnu")
   THREAD_LIBS=-lpthread
   LIBS=-ldl -lm
 
-  ifeq ($(PLATFORM_HACK),raspberrypi)
+  ifeq ($(PLATFORM_HACK),gles)
   BASE_CFLAGS += -DHAVE_GLES
-  LDFLAGS += -L/opt/vc/lib
-  CLIENT_LIBS=$(SDL_LIBS) -lbcm_host
-  RENDERER_LIBS = $(SDL_LIBS) -lbcm_host -lEGL -lGLESv1_CM
-  SDLDIR=$(MOUNT_DIR)/raspberry
-  RPI_VIDEO=1
+  LDFLAGS += -L/usr/lib/mali
+  CLIENT_LIBS=$(SDL_LIBS)
+  RENDERER_LIBS = $(SDL_LIBS) -lEGL -lGLESv1_CM
   else
   CLIENT_LIBS=$(SDL_LIBS)
   RENDERER_LIBS = $(SDL_LIBS) -lGL
